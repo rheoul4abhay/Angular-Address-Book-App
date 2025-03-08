@@ -1,0 +1,11 @@
+<div class="w-full px-36 py-10">
+    <div class="w-full flex justify-between items-center select-none">
+        <h3 class="text-2xl font-medium text-gray-700">
+            {{this.pageTitle}}
+        </h3>
+        <div class="flex justify-center items-center gap-2 bg-blue-500 text-white fill-white p-3 px-12 rounded-md hover:cursor-pointer hover:bg-blue-600" (click)="addPersonOnClick($event)">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" class="w-5"><path d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 144L48 224c-17.7 0-32 14.3-32 32s14.3 32 32 32l144 0 0 144c0 17.7 14.3 32 32 32s32-14.3 32-32l0-144 144 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-144 0 0-144z"/></svg>
+            Add Person
+        </div>
+    </div>
+</div>
