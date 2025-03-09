@@ -1,101 +1,192 @@
 <div class="w-full px-36 py-12 flex justify-center items-center">
-    <form class="bg-white flex flex-col w-[50rem] h-[40rem] shadow-xl rounded-lg">
-
-        <!--Form header-->
-        <div class="w-full h-[6rem] relative text-white bg-blue-500 tracking-wide flex justify-center items-center uppercase rounded-t-lg">
-            <h2 class="select-none text-2xl text-white uppercase">
-                {{this.formTitle}}
-            </h2>
-            <svg class="w-8 h-8 absolute right-12 rounded-full flex hover:cursor-pointer hover:fill-gray-200 bg-blue-500 text-white fill-white" (click)="handleBackClick($event)" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-                <path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM175 175c9.4-9.4 24.6-9.4 33.9 0l47 47 47-47c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9l-47 47 47 47c9.4 9.4 9.4 24.6 0 33.9s-24.6 9.4-33.9 0l-47-47-47 47c-9.4 9.4-24.6 9.4-33.9 0s-9.4-24.6 0-33.9l47-47-47-47c-9.4-9.4-9.4-24.6 0-33.9z"/>
-            </svg>
+    <form #personForm="ngForm" (ngSubmit)="onSubmit(personForm)" (reset)="onReset(personForm)" class="bg-white flex flex-col w-[50rem] min-h-[40rem] shadow-xl rounded-lg">
+      <!-- Form header -->
+      <div class="w-full h-[6rem] relative text-white bg-blue-500 tracking-wide flex justify-center items-center uppercase rounded-t-lg">
+        <h2 class="select-none text-2xl text-white uppercase">
+          {{ this.formTitle }}
+        </h2>
+        <svg
+          class="w-8 h-8 absolute right-12 rounded-full flex hover:cursor-pointer hover:fill-gray-200 bg-blue-500 text-white fill-white"
+          (click)="handleBackClick($event)"
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 512 512"
+        >
+          <path
+            d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM175 175c9.4-9.4 24.6-9.4 33.9 0l47 47 47-47c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9l-47 47 47 47c9.4 9.4 9.4 24.6 0 33.9s-24.6 9.4-33.9 0l-47-47-47 47c-9.4 9.4-24.6 9.4-33.9 0s-9.4-24.6 0-33.9l47-47-47-47c-9.4-9.4-9.4-24.6 0-33.9z"
+          />
+        </svg>
+      </div>
+  
+      <!-- Form fields -->
+      <div class="w-full h-full flex flex-col gap-4 px-20 py-10 rounded-b-lg">
+        <!-- Name Field -->
+        <div class="flex flex-col gap-1">
+          <label for="name" class="font-medium text-l text-gray-600">Full Name</label>
+          <input
+            [(ngModel)]="person.name"
+            #name="ngModel"
+            (input)="onInput($event, 'name')"
+            id="name"
+            type="text"
+            name="name"
+            class="border-2 border-gray-300 rounded-sm p-2 focus:border-gray-500 outline-none"
+            required
+          />
+          <!-- Required Field Error Message -->
+          <p class="text-red-500 text-sm min-h-[1.5rem]" *ngIf="(name.touched || personForm.submitted) && name.value === ''">
+            This field is required
+          </p>
+          <!-- Custom Error Message -->
+          <p class="text-red-500 text-sm" *ngIf="(name.touched || personForm.submitted) && name.value !== '' && errorMessages['name']">
+            {{ errorMessages['name'] }}
+          </p>
         </div>
-
-        <!--Form fields-->
-        <div class="w-full h-full flex flex-col gap-4 px-20 py-10 rounded-b-lg">
-
-            <div class="flex flex-col gap-1">
-                <label for="name" class="font-medium text-l text-gray-600">
-                    Full Name
-                </label>
-                <input id="name" type="text" name="full-name" class="border-2 border-gray-300 rounded-sm p-2 focus:border-gray-500 outline-none" required>
-            </div>
-
-            <div class="flex flex-col gap-1">
-                <label for="phone-number" class="font-medium text-l text-gray-600">
-                    Phone Number
-                </label>
-                <input id="phone-number" type="tel" name="phone-number" class="border-2 border-gray-300 rounded-sm p-2 focus:border-gray-500 outline-none" required>
-            </div>
-
-            <div class="flex flex-col gap-1">
-                <label for="address" class="font-medium text-l text-gray-600">
-                    Address
-                </label>
-                <textarea name="address" id="address" class="border-2 border-gray-300 rounded-sm p-2 focus:border-gray-500 outline-none resize-none h-[5rem]" required></textarea>
-            </div>
-
-            <div class="flex justify-between gap-1">
-
-                <div class="flex flex-col gap-1 w-[30%]">
-                    <label for="city" class="font-medium text-l text-gray-600">
-                        City
-                    </label>
-                    <select name="city" id ="city" class="border-2 border-gray-300 rounded-sm p-2 outline-none text-gray-700" required>
-                        <option value="" disabled selected class="text-gray-800">Select City</option>
-                        <option value="ahmedabad">Ahmedabad</option>
-                        <option value="bangalore">Bangalore</option>
-                        <option value="bhopal">Bhopal</option>
-                        <option value="chennai">Chennai</option>
-                        <option value="delhi">Delhi</option>
-                        <option value="hyderabad">Hyderabad</option>
-                        <option value="jaipur">Jaipur</option>
-                        <option value="kolkata">Kolkata</option>
-                        <option value="lucknow">Lucknow</option>
-                        <option value="mumbai">Mumbai</option>
-                        <option value="noida">Noida</option>
-                        <option value="pune">Pune</option>
-                    </select>
-                </div>
-
-                <div class="flex flex-col gap-1 w-[30%]">
-                    <label for="state" class="font-medium text-l text-gray-600">State</label>
-                    <select name="state" id ="state" class="border-2 border-gray-300 rounded-sm p-2 outline-none text-gray-700" required>
-                    <option value="" disabled selected class=" text-gray-800">Select State</option>
-                    <option value="andhra-pradesh">Andhra Pradesh</option>
-                    <option value="delhi-ncr">Delhi NCR</option>
-                    <option value="gujarat">Gujarat</option>
-                    <option value="karnataka">Karnataka</option>
-                    <option value="madhya-pradesh">Madhya Pradesh</option>
-                    <option value="maharashtra">Maharashtra</option>
-                    <option value="rajasthan">Rajasthan</option>
-                    <option value="tamil-nadu">Tamil Nadu</option>
-                    <option value="uttar-pradesh">Uttar Pradesh</option>
-                    <option value="west-bengal">West Bengal</option>
-                    </select>
-                </div>
-
-                <div class="flex flex-col gap-1 w-[30%]">
-                    <label for="zip" class="font-medium text-l text-gray-600">Zip</label>
-                    <input name="zip" id="zip" type="text" class="border-2 border-gray-300 rounded-sm p-2 outline-none text-gray-700" required>
-                </div>
-
-            </div>
-
-            <!--Form submit and reset buttons-->
-            <div class="flex justify-end gap-10 mt-7">
-                <button type="submit" class="p-2 px-12 flex justify-center items-center bg-gray-400 font-medium text-l rounded hover:cursor-pointer hover:text-gray-100">
-                    <p>
-                        Add
-                    </p>
-                </button>
-
-                <button type="reset" class="p-2 px-12 flex justify-center items-center bg-gray-400 font-medium text-l rounded hover:cursor-pointer hover:text-gray-100">
-                    <p>
-                        Reset
-                    </p>
-                </button>
-            </div>
+  
+        <!-- Phone Field -->
+        <div class="flex flex-col gap-1">
+          <label for="phone-number" class="font-medium text-l text-gray-600">Phone Number</label>
+          <input
+            [(ngModel)]="person.phone"
+            #phone="ngModel"
+            (input)="onInput($event, 'phone')"
+            id="phone-number"
+            type="tel"
+            name="phone"
+            class="border-2 border-gray-300 rounded-sm p-2 focus:border-gray-500 outline-none"
+            required
+          />
+          <!-- Required Field Error Message -->
+          <p class="text-red-500 text-sm min-h-[1.5rem]" *ngIf="(phone.touched || personForm.submitted) && phone.value === ''">
+            This field is required
+          </p>
+          <!-- Custom Error Message -->
+          <p class="text-red-500 text-sm" *ngIf="(phone.touched || personForm.submitted) && phone.value !== '' && errorMessages['phone']">
+            {{ errorMessages['phone'] }}
+          </p>
         </div>
+  
+        <!-- Address Field -->
+        <div class="flex flex-col gap-1">
+          <label for="address" class="font-medium text-l text-gray-600">Address</label>
+          <textarea
+            [(ngModel)]="person.address"
+            #address="ngModel"
+            (input)="onInput($event, 'address')"
+            name="address"
+            id="address"
+            class="border-2 border-gray-300 rounded-sm p-2 focus:border-gray-500 outline-none resize-none h-[5rem]"
+            required
+          ></textarea>
+          <!-- Required Field Error Message -->
+          <p class="text-red-500 text-sm min-h-[1.5rem]" *ngIf="(address.touched || personForm.submitted) && address.value === ''">
+            This field is required
+          </p>
+          <!-- Custom Error Message -->
+          <p class="text-red-500 text-sm" *ngIf="(address.touched || personForm.submitted) && address.value !== '' && errorMessages['address']">
+            {{ errorMessages['address'] }}
+          </p>
+        </div>
+  
+        <!-- City, State, and Zip Fields -->
+        <div class="flex justify-between gap-1">
+          <!-- City Field -->
+          <div class="flex flex-col gap-1 w-[30%]">
+            <label for="city" class="font-medium text-l text-gray-600">City</label>
+            <select
+              [(ngModel)]="person.city"
+              #city="ngModel"
+              name="city"
+              id="city"
+              class="border-2 border-gray-300 rounded-sm p-2 outline-none text-gray-700"
+              required
+            >
+              <option value="" disabled selected class="text-gray-800">Select City</option>
+              <option value="ahmedabad">Ahmedabad</option>
+              <option value="bangalore">Bangalore</option>
+              <option value="bhopal">Bhopal</option>
+              <option value="chennai">Chennai</option>
+              <option value="delhi">Delhi</option>
+              <option value="hyderabad">Hyderabad</option>
+              <option value="jaipur">Jaipur</option>
+              <option value="kolkata">Kolkata</option>
+              <option value="lucknow">Lucknow</option>
+              <option value="mumbai">Mumbai</option>
+              <option value="noida">Noida</option>
+              <option value="pune">Pune</option>
+            </select>
+            <!-- Required Field Error Message -->
+            <p class="text-red-500 text-sm min-h-[1.5rem]" *ngIf="(city.touched || personForm.submitted) && city.value === ''">
+              This field is required
+            </p>
+          </div>
+  
+          <!-- State Field -->
+          <div class="flex flex-col gap-1 w-[30%]">
+            <label for="state" class="font-medium text-l text-gray-600">State</label>
+            <select
+              [(ngModel)]="person.state"
+              #state="ngModel"
+              name="state"
+              id="state"
+              class="border-2 border-gray-300 rounded-sm p-2 outline-none text-gray-700"
+              required
+            >
+              <option value="" disabled selected class="text-gray-800">Select State</option>
+              <option value="andhra-pradesh">Andhra Pradesh</option>
+              <option value="delhi-ncr">Delhi NCR</option>
+              <option value="gujarat">Gujarat</option>
+              <option value="karnataka">Karnataka</option>
+              <option value="madhya-pradesh">Madhya Pradesh</option>
+              <option value="maharashtra">Maharashtra</option>
+              <option value="rajasthan">Rajasthan</option>
+              <option value="tamil-nadu">Tamil Nadu</option>
+              <option value="uttar-pradesh">Uttar Pradesh</option>
+              <option value="west-bengal">West Bengal</option>
+            </select>
+            <!-- Required Field Error Message -->
+            <p class="text-red-500 text-sm min-h-[1.5rem]" *ngIf="(state.touched || personForm.submitted) && state.value === ''">
+              This field is required
+            </p>
+          </div>
+  
+          <!-- Zip Field -->
+          <div class="flex flex-col gap-1 w-[30%]">
+            <label for="zip" class="font-medium text-l text-gray-600">Zip</label>
+            <input
+              [(ngModel)]="person.zip"
+              #zip="ngModel"
+              (input)="onInput($event, 'zip')"
+              name="zip"
+              id="zip"
+              type="text"
+              class="border-2 border-gray-300 rounded-sm p-2 outline-none text-gray-700"
+              required
+            />
+            <!-- Required Field Error Message -->
+            <p class="text-red-500 text-sm min-h-[1.5rem]" *ngIf="(zip.touched || personForm.submitted) && zip.value === ''">
+              This field is required
+            </p>
+            <!-- Custom Error Message -->
+            <p class="text-red-500 text-sm" *ngIf="(zip.touched || personForm.submitted) && zip.value !== '' && errorMessages['zip']">
+              {{ errorMessages['zip'] }}
+            </p>
+          </div>
+        </div>
+  
+        <!-- Form submit and reset buttons -->
+        <div class="flex justify-end gap-10 mt-7">
+          <button
+            type="submit"
+            class="p-2 px-12 flex justify-center items-center bg-gray-400 font-medium text-l rounded hover:cursor-pointer hover:text-gray-100">
+            <p>Add</p>
+          </button>
+          <button
+          type="reset"
+          class="p-2 px-12 flex justify-center items-center bg-gray-400 font-medium text-l rounded hover:cursor-pointer hover:text-gray-100"
+          (click)="onReset(personForm)">
+          <p>Reset</p>
+        </button>
+        </div>
+      </div>
     </form>
-</div>
+  </div>
