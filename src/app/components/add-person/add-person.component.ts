@@ -1,118 +1,156 @@
 import { Person } from '../../models/person';
 import { PersonService } from '../../services/person.service';
 import { FormsModule, NgForm } from '@angular/forms';
-import { CommonModule } from '@angular/common';
-import { NgModel } from '@angular/forms';
-import { ChangeDetectorRef, Component } from '@angular/core';
-import { Router } from '@angular/router';
+import { CommonModule } from '@angular/common'; 
+import { Component } from '@angular/core';
 
 @Component({
   selector: 'app-add-person',
   standalone: true,
   imports: [FormsModule, CommonModule],
   templateUrl: './add-person.component.html',
-  styleUrl: './add-person.component.css',
+  styleUrl: './add-person.component.css'
 })
 export class AddPersonComponent {
-  defaultPageURL = 'http://localhost:4200/';
-  formTitle = 'Person Address Form';
-  person: Person = { id: 0, name: '', phone: '', address: '', city: '', state: '', zip: '' };
-
+  defaultPageURL = '/';
+  formTitle = "Person Address Form";
+  person: Person = { id: 0, name: "", phone: "", address: "", city: "", state: "", zip: "" };
+  
   // Error messages object for dynamic tracking
   errorMessages: { [key: string]: string } = {};
+  
+  //To Track if input fields have been touched or interacted with
+  touchedFields: Record<Exclude<keyof Person, 'id'>, boolean> = {
+    name: false,
+    phone: false,
+    address: false,
+    city: false,
+    state: false,
+    zip: false
+  };
 
   // Regex patterns for validation
-  private regexPatterns: Record<Exclude<keyof Person, 'id'>, RegExp> = {
+  private regexPatterns: Record<Exclude<keyof Person, 'id' | 'city' | 'state'>, RegExp> = {
     name: /^[A-Z][a-zA-Z\s]{2,}$/,
     phone: /^\+?([0-9]{1,3}[-.])?[0-9]{10}$/,
     address: /^[A-Za-z0-9,.-\s]{4,}$/,
-    zip: /^[1-9][0-9]{5}$/,
-    city: /^[A-Za-z0-9\s]{2,}$/,
-    state: /^[A-Za-z0-9\s]{2,}$/,
+    zip: /^[1-9][0-9]{5}$/
   };
 
   // Static error messages for validation
-  private staticErrorMessages: Record<Exclude<keyof Person, 'id'>, string> = {
+  private staticErrorMessages: Record<Exclude<keyof Person, 'id' | 'city' | 'state'>, string> = {
     name: 'Name should start with a capital letter and contain at least 3 characters.',
     phone: 'Invalid phone number',
     address: 'Must contain at least 4 valid characters',
-    zip: 'Invalid zip code',
-    city: 'Must contain at least 2 characters',
-    state: 'Must contain at least 2 characters',
+    zip: 'Invalid zip code'
   };
 
-  // Initializing person service
-  constructor(private personService: PersonService, private cdRef: ChangeDetectorRef) {}
+  constructor(private personService: PersonService) {}
 
+  //Back Click handling
   handleBackClick($event: Event) {
     console.log('Back click button is working');
     window.open(this.defaultPageURL, '_self');
   }
 
-  // Form validation
-  onInput(event: Event, fieldName: Exclude<keyof Person, 'id'>): void {
-    const inputValue = (event.target as HTMLInputElement).value;
-    const value = inputValue.trim();
-
-    // Validate first, then assign value if valid
-    if (inputValue.trim() === '') {
-      this.errorMessages[fieldName] = 'This field cannot be empty or contain only spaces.';
-    } else if (!this.regexPatterns[fieldName].test(value) && value !== '') {
+  //For Real-time validation as user types
+  onInput(event: Event, fieldName: Exclude<keyof Person, 'id' | 'city' | 'state'>): void {
+    const input = event.target as HTMLInputElement;
+    const value = input.value;
+    
+    // Mark field as touched when user interacts with it
+    this.touchedFields[fieldName] = true;
+    
+    //Update the model with latest value
+    this.person[fieldName] = value;
+    
+    //To validate field in real time 
+    this.validateField(fieldName, value);
+  }
+  
+  // Separate validation method for better organization
+  validateField(fieldName: Exclude<keyof Person, 'id' | 'city' | 'state'>, value: string): void {
+    const trimmedValue = value.trim();
+    
+    if (trimmedValue === '') {
+      this.errorMessages[fieldName] = 'This field is required';
+    } else if (!this.regexPatterns[fieldName].test(trimmedValue)) {
       this.errorMessages[fieldName] = this.staticErrorMessages[fieldName];
     } else {
       delete this.errorMessages[fieldName];
     }
+  }
 
-    // Assign value after validation
-    this.person[fieldName] = value;
+  //To check if the form is fully valid
+  validateAllFields(): boolean {
+    let isValid = true;
+    
+    // Fields to be validated
+    const fieldsToValidate = ['name', 'phone', 'address', 'zip'];
+    
+    // Validate each field
+    for (const field of fieldsToValidate) {
+      // @ts-ignore - To Tell TypeScript to ignore this potential type error
+      this.touchedFields[field] = true;
+      
+      // @ts-ignore - Tell TypeScript to ignore this potential type error
+      const value = (this.person[field] || '').trim();
+      
+      //Excluding keys of id, city and state below as they are not a part of the validation
+      this.validateField(field as Exclude<keyof Person, 'id' | 'city' | 'state'>, value);
+      
+      if (this.errorMessages[field]) {
+        isValid = false;
+      }
+    }
+    
+    return isValid;
   }
 
   onSubmit(form: NgForm): void {
-    // Mark all fields as touched to trigger validation messages
-    Object.values(form.controls).forEach((control) => {
-      control.markAsTouched();
+    // Mark all fields as touched to trigger validation messages(shorthand way to the code above)
+    Object.keys(this.touchedFields).forEach(field => {
+      this.touchedFields[field as keyof typeof this.touchedFields] = true;
     });
 
-    // Check for regex violations and update errorMessages
-    let isFormValid = true;
+    const isFormValid = this.validateAllFields();
 
-    Object.keys(this.regexPatterns).forEach((fieldName) => {
-      const key = fieldName as Exclude<keyof Person, 'id'>; // Explicitly cast to the correct type
-      const value = this.person[key] as string;
-
-      if (!this.regexPatterns[key].test(value)) {
-        this.errorMessages[key] = this.staticErrorMessages[key]; // Access using the correct type
-        isFormValid = false;
-      } else {
-        delete this.errorMessages[key]; // Access using the correct type
-      }
-    });
-
-    // Check if the form is invalid (either due to Angular validation or regex violations)
-    if (form.invalid || !isFormValid) {
-      console.warn('Form is invalid. Please correct the following fields:');
-
-      // Log invalid fields to the console for debugging
-      Object.keys(form.controls).forEach((key) => {
-        const control = form.controls[key];
-        if (control.invalid) {
-          console.warn(`- ${key}: ${control.errors ? JSON.stringify(control.errors) : 'Invalid'}`);
-        }
-      });
-      return; // Stop form submission if invalid
+    // Check if the form is invalid
+    if (!isFormValid) {
+      console.warn('Form is invalid. Please correct the errors.');
+      return;
     }
 
-    // Proceed with submission if valid
-    console.log('Form submitted:', this.person);
-    this.personService.addPerson(this.person);
-    form.resetForm(); // Reset the form
-    this.errorMessages = {}; // Clear all custom error messages
+    // Create a clean copy of the person object with trimmed values if the form is valid
+    const cleanPerson: Person = {
+      ...this.person,
+      name: this.person.name.trim(),
+      phone: this.person.phone.trim(),
+      address: this.person.address.trim(),
+      city: this.person.city.trim(),
+      state: this.person.state.trim(),
+      zip: this.person.zip.trim()
+    };
+
+    console.log('Form submitted:', cleanPerson);
+    this.personService.addPerson(cleanPerson);
+    
+    // Reset the form so we can continue the process for next user from scratch
+    this.onReset(form);
   }
 
   // Method to handle form reset
   onReset(form: NgForm): void {
-    form.resetForm(); // Reset the form and its state
-    this.errorMessages = {}; // Clear all custom error messages
-    this.person = { id: 0, name: '', phone: '', address: '', city: '', state: '', zip: '' }; // Reset the person object
+    this.person = { id: 0, name: '', phone: '', address: '', city: '', state: '', zip: '' };
+    form.resetForm(this.person);
+    this.errorMessages = {}; 
+    this.touchedFields = {
+      name: false,
+      phone: false,
+      address: false,
+      city: false,
+      state: false,
+      zip: false
+    };
   }
 }
