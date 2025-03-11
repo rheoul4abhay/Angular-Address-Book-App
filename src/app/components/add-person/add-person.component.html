@@ -56,7 +56,7 @@
                   <label for="city" class="font-medium text-l text-gray-600">
                       City
                   </label>
-                  <select [(ngModel)]="person.city" #city="ngModel" name="city" id="city" class="border-2 border-gray-300 rounded-sm p-2 outline-none text-gray-700" required>
+                  <select [(ngModel)]="person.city" #city="ngModel" (change)="onSelectChange('city')"  name="city" id="city" class="border-2 border-gray-300 rounded-sm p-2 outline-none text-gray-700" required>
                       <option value="" disabled selected class="text-gray-800">Select City</option>
                       <option value="ahmedabad">Ahmedabad</option>
                       <option value="bangalore">Bangalore</option>
@@ -73,14 +73,14 @@
                   </select>
                   
                   <!-- Combined Error Message -->
-                  <p class="text-red-500 text-sm min-h-[1.5rem]" *ngIf="city.value === '' && personForm.submitted">
-                      This field is required
+                  <p class="text-red-500 text-sm min-h-[1.5rem]" *ngIf="touchedFields['city'] && errorMessages['city']">
+                      {{errorMessages['city']}}
                   </p>
               </div>
 
               <div class="flex flex-col gap-1 w-[30%]">
                   <label for="state" class="font-medium text-l text-gray-600">State</label>
-                  <select [(ngModel)]="person.state" #state="ngModel" name="state" id="state" class="border-2 border-gray-300 rounded-sm p-2 outline-none text-gray-700" required>
+                  <select [(ngModel)]="person.state" #state="ngModel" name="state" (change)="onSelectChange('state')" id="state" class="border-2 border-gray-300 rounded-sm p-2 outline-none text-gray-700" required>
                   <option value="" disabled selected class="text-gray-800">Select State</option>
                   <option value="andhra-pradesh">Andhra Pradesh</option>
                   <option value="delhi-ncr">Delhi NCR</option>
@@ -95,8 +95,8 @@
                   </select>
 
                   <!--Error Message-->
-                  <p class="text-red-500 text-sm min-h-[1.5rem]" *ngIf="state.value === '' && personForm.submitted">
-                    This field is required
+                  <p class="text-red-500 text-sm min-h-[1.5rem]" *ngIf="touchedFields['state'] && errorMessages['state']">
+                    {{errorMessages['state']}}
                   </p>
               </div>
 

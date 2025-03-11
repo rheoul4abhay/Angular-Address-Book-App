@@ -53,6 +53,20 @@ export class AddPersonComponent {
     this.router.navigate([this.defaultPageURL]);
   }
 
+  onSelectChange(fieldName: 'city' | 'state'): void {
+    this.touchedFields[fieldName] = true;
+    this.validateSelectField(fieldName, this.person[fieldName]);
+  }
+
+  validateSelectField(fieldName: 'city' | 'state', value: string): void {
+    const trimmedValue = value.trim();
+    if (trimmedValue === '') {
+      this.errorMessages[fieldName] = 'This field is required';
+    } else {
+      delete this.errorMessages[fieldName];
+    }
+  }
+  
   //For Real-time validation as user types
   onInput(event: Event, fieldName: Exclude<keyof Person, 'id' | 'city' | 'state'>): void {
     const input = event.target as HTMLInputElement;
@@ -83,28 +97,30 @@ export class AddPersonComponent {
 
   //To check if the form is fully valid
   validateAllFields(): boolean {
-    let isValid = true;
+    let isValid = true; // To check if the form is fully valid
     
     // Fields to be validated
-    const fieldsToValidate = ['name', 'phone', 'address', 'zip'];
+    const fieldsToValidate: Array<Exclude<keyof Person, 'id'>> = ['name', 'phone', 'address', 'city', 'state', 'zip'];
     
     // Validate each field
     for (const field of fieldsToValidate) {
-      // @ts-ignore - To Tell TypeScript to ignore this potential type error
       this.touchedFields[field] = true;
-      
-      // @ts-ignore - Tell TypeScript to ignore this potential type error
       const value = (this.person[field] || '').trim();
       
-      //Excluding keys of id, city and state below as they are not a part of the validation
-      this.validateField(field as Exclude<keyof Person, 'id' | 'city' | 'state'>, value);
+      //We Handle city and state here separately since they use select fields(different validation)
+      if (field === 'city' || field === 'state') {
+        this.validateSelectField(field, value);
+      } else {
+        // Excluding keys of id, city, and state below as they are not a part of the regex validation
+        this.validateField(field as Exclude<keyof Person, 'id' | 'city' | 'state'>, value);
+      }
       
       if (this.errorMessages[field]) {
-        isValid = false;
+        isValid = false; // If any field has an error, mark form as invalid
       }
     }
     
-    return isValid;
+    return isValid; // Return the validation result
   }
 
   onSubmit(form: NgForm): void {
