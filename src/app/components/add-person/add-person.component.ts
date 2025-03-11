@@ -3,6 +3,7 @@ import { PersonService } from '../../services/person.service';
 import { FormsModule, NgForm } from '@angular/forms';
 import { CommonModule } from '@angular/common'; 
 import { Component } from '@angular/core';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-add-person',
@@ -45,12 +46,11 @@ export class AddPersonComponent {
     zip: 'Invalid zip code'
   };
 
-  constructor(private personService: PersonService) {}
-
+  constructor(private personService: PersonService, private router: Router) {}
   //Back Click handling
   handleBackClick($event: Event) {
     console.log('Back click button is working');
-    window.open(this.defaultPageURL, '_self');
+    this.router.navigate([this.defaultPageURL]);
   }
 
   //For Real-time validation as user types
@@ -137,6 +137,8 @@ export class AddPersonComponent {
     
     // Reset the form so we can continue the process for next user from scratch
     this.onReset(form);
+
+    this.router.navigate([this.defaultPageURL]); // Navigate back without reload
   }
 
   // Method to handle form reset
