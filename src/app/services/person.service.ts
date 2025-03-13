@@ -9,8 +9,16 @@ export class PersonService {
   private static nextID = 1;
 
   //Adding new person with auto generated ID
-  addPerson(person: Person){
-    const newPerson = {...person, id:PersonService.nextID++}
+  addPerson(person: Person) {
+    const newPerson = new Person(
+      PersonService.nextID++,
+      person.name,
+      person.phone,
+      person.address,
+      person.city,
+      person.state,
+      person.zip
+    );
     this.persons.push(newPerson);
   }
 
